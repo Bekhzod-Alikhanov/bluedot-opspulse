@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm --version)",
+      "Bash(npx --version)",
+      "Bash(git --version)",
+      "Bash(bluedot)",
+      "Bash(work test\" ; echo \"---\"; ls \"C:\\\\Users\\\\behzo\\\\Downloads\\\\Course Operations Lead_ Work Test Details.docx\" 2>/dev/null && echo \"DOCX EXISTS\")",
+      "Read(//c/Users/behzo/Downloads/**)",
+      "Bash(cd /tmp/docx_extract && cat word/document.xml | sed -e 's/<[^>]*>/ /g' | tr -s ' ' | tail -c +6000 | head -c 5000)"
+    ]
+  }
+}
