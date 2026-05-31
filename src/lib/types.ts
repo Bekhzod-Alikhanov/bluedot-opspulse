@@ -69,6 +69,7 @@ export interface Incident {
   resolved_at: string | null;
   resolved_by: string | null;
   auto_created: boolean;
+  snooze_until?: string | null;
 }
 
 export interface BackupFacilitator {

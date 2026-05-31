@@ -29,9 +29,16 @@ const incidents = [
 for (const [id, raised, due] of incidents) {
   await sb.from("incidents").update({
     status: "Open", resolved_at: null, resolved_by: null, assignee: null,
+    notes: null, snooze_until: null,
     raised_at: hoursAgo(-raised), sla_due: hoursAhead(due),
   }).eq("id", id);
 }
+
+// 2b. Remove any manually-created incidents not in the seed set.
+const seedIds = incidents.map(([id]) => id);
+const { data: allInc } = await sb.from("incidents").select("id");
+const extra = (allInc ?? []).map((r) => r.id).filter((id) => !seedIds.includes(id));
+if (extra.length) await sb.from("incidents").delete().in("id", extra);
 
 // 3. Reset cohorts that the demo mutates
 await sb.from("cohorts").update({ risk: "Amber", headline: "Facilitator down with flu as of Monday AM. Thursday 6-8pm session needs cover." }).eq("id", 10);

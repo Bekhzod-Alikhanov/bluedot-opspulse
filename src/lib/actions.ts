@@ -34,6 +34,69 @@ export async function resolveIncident(id: string) {
   return { ok: true };
 }
 
+export interface NewIncidentInput {
+  title: string;
+  priority: "P0" | "P1" | "P2";
+  source: string;
+  description: string;
+  action: string;
+  cohort_code: string | null;
+  slaHours: number;
+}
+
+export async function createIncident(input: NewIncidentInput) {
+  const a = await actor();
+  const admin = createSupabaseAdmin();
+  const id = `INC-${Math.floor(1000 + Math.random() * 8999)}`;
+  const health = input.priority === "P0" ? 10 : input.priority === "P1" ? 6 : 2;
+  const sla_due = new Date(Date.now() + input.slaHours * 3_600_000).toISOString();
+  await admin.from("incidents").insert({
+    id,
+    title: input.title,
+    priority: input.priority,
+    status: "Open",
+    source: input.source || `Manual · ${a.name}`,
+    description: input.description,
+    action: input.action,
+    health_impact: health,
+    cohort_code: input.cohort_code,
+    round_id: 4,
+    sla_due,
+    auto_created: false,
+  });
+  await logAction({ actor: a.name, actorRole: a.role, action: "create_incident", targetType: "incident", targetId: id, payload: { priority: input.priority } });
+  revalidateAll();
+  return { ok: true, id };
+}
+
+export async function snoozeIncident(id: string, hours: number) {
+  const a = await actor();
+  const admin = createSupabaseAdmin();
+  const until = new Date(Date.now() + hours * 3_600_000).toISOString();
+  await admin.from("incidents").update({ status: "Snoozed", snooze_until: until }).eq("id", id);
+  await logAction({ actor: a.name, actorRole: a.role, action: "snooze_incident", targetType: "incident", targetId: id, payload: { hours } });
+  revalidateAll();
+  return { ok: true };
+}
+
+export async function unsnoozeIncident(id: string) {
+  const a = await actor();
+  const admin = createSupabaseAdmin();
+  await admin.from("incidents").update({ status: "Open", snooze_until: null }).eq("id", id);
+  await logAction({ actor: a.name, actorRole: a.role, action: "unsnooze_incident", targetType: "incident", targetId: id });
+  revalidateAll();
+  return { ok: true };
+}
+
+export async function updateIncidentNotes(id: string, notes: string) {
+  const a = await actor();
+  const admin = createSupabaseAdmin();
+  await admin.from("incidents").update({ notes }).eq("id", id);
+  await logAction({ actor: a.name, actorRole: a.role, action: "update_notes", targetType: "incident", targetId: id });
+  revalidateAll();
+  return { ok: true };
+}
+
 export async function assignIncident(id: string, assignee: string) {
   const a = await actor();
   const admin = createSupabaseAdmin();

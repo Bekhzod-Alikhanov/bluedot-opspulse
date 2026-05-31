@@ -2,47 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Radar,
-  Inbox,
-  LayoutGrid,
-  CalendarClock,
-  ReceiptText,
-  BellRing,
-  BarChart3,
-  FileText,
-  Activity,
-  LogOut,
-  Plane,
-} from "lucide-react";
+import { Activity, LogOut, Plane } from "lucide-react";
 import { signOut } from "@/app/login/actions";
 import type { Role } from "@/lib/types";
 import { SYSTEM } from "@/lib/types";
-
-interface NavItem {
-  href: string;
-  label: string;
-  sub: string;
-  icon: typeof Radar;
-  roles: Role[];
-}
-
-const NAV: NavItem[] = [
-  { href: "/", label: "Control Room", sub: "Overview", icon: Radar, roles: ["ops", "management"] },
-  { href: "/queue", label: "Triage Queue", sub: "Live inbox", icon: Inbox, roles: ["ops"] },
-  { href: "/triage", label: "Cohort Triage", sub: "6 cohorts", icon: LayoutGrid, roles: ["ops"] },
-  { href: "/backup", label: "Backup Matcher", sub: "Scheduling", icon: CalendarClock, roles: ["ops"] },
-  { href: "/finance", label: "Financial Hygiene", sub: "Invoice audit", icon: ReceiptText, roles: ["ops"] },
-  { href: "/alerts", label: "Monitors & Alerts", sub: "Prevention", icon: BellRing, roles: ["ops", "management"] },
-  { href: "/cockpit", label: "Leadership Cockpit", sub: "Trends & risk", icon: BarChart3, roles: ["management"] },
-  { href: "/templates", label: "Comms Library", sub: "Templates", icon: FileText, roles: ["ops", "management"] },
-];
-
-function healthTone(h: number) {
-  if (h >= 85) return { text: "text-emerald-300", bar: "bg-emerald-400", ring: "border-emerald-500/40", label: "Nominal" };
-  if (h >= 60) return { text: "text-amber-300", bar: "bg-amber-400", ring: "border-amber-500/40", label: "Action Required" };
-  return { text: "text-rose-300", bar: "bg-rose-400", ring: "border-rose-500/40", label: "Critical" };
-}
+import { navFor, healthTone } from "@/components/nav/navItems";
 
 export default function Sidebar({
   role,
@@ -59,11 +23,10 @@ export default function Sidebar({
 }) {
   const pathname = usePathname();
   const tone = healthTone(systemHealth);
-  const items = NAV.filter((n) => n.roles.includes(role));
+  const items = navFor(role);
 
   return (
     <aside className="sticky top-0 hidden h-screen w-[268px] shrink-0 flex-col border-r border-slate-800/80 bg-slate-950/40 px-5 py-6 backdrop-blur-md lg:flex">
-      {/* Brand */}
       <div className="mb-6 flex items-center gap-3 px-1">
         <div className="relative flex h-9 w-9 items-center justify-center rounded-lg bg-signal/15 ring-1 ring-signal/40">
           <span className="absolute h-2 w-2 rounded-full bg-signal" />
@@ -77,15 +40,12 @@ export default function Sidebar({
         </div>
       </div>
 
-      {/* Health */}
       <div className={`mb-6 rounded-xl border bg-slate-900/50 p-4 ${tone.ring}`}>
         <div className="flex items-center justify-between">
           <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-slate-400">
             <Activity className="h-3 w-3" /> System Health
           </span>
-          <span className={`font-mono text-[10px] font-semibold uppercase tracking-wider ${tone.text}`}>
-            {tone.label}
-          </span>
+          <span className={`font-mono text-[10px] font-semibold uppercase tracking-wider ${tone.text}`}>{tone.label}</span>
         </div>
         <div className="mt-2 flex items-baseline gap-1">
           <span className={`tabular font-mono text-3xl font-bold ${tone.text}`}>{systemHealth}</span>
@@ -99,7 +59,6 @@ export default function Sidebar({
         </p>
       </div>
 
-      {/* Nav */}
       <nav className="flex flex-col gap-1">
         {items.map((item) => {
           const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
@@ -109,9 +68,7 @@ export default function Sidebar({
               key={item.href}
               href={item.href}
               className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 transition ${
-                active
-                  ? "bg-slate-800/70 text-slate-50 ring-1 ring-slate-700"
-                  : "text-slate-400 hover:bg-slate-900/60 hover:text-slate-200"
+                active ? "bg-slate-800/70 text-slate-50 ring-1 ring-slate-700" : "text-slate-400 hover:bg-slate-900/60 hover:text-slate-200"
               }`}
             >
               <Icon className={`h-[18px] w-[18px] ${active ? "text-signal" : "text-slate-500 group-hover:text-slate-300"}`} />
@@ -125,7 +82,6 @@ export default function Sidebar({
         })}
       </nav>
 
-      {/* Footer */}
       <div className="mt-auto space-y-3 border-t border-slate-800/80 pt-4">
         <div className="flex items-start gap-2 px-1">
           <Plane className="mt-0.5 h-3.5 w-3.5 shrink-0 text-slate-600" />

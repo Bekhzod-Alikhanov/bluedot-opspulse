@@ -68,12 +68,23 @@ export async function getRoundMetrics(): Promise<RoundMetric[]> {
   return (data ?? []) as RoundMetric[];
 }
 
-export async function getActionLog(limit = 12): Promise<ActionLogEntry[]> {
+export async function getActionLog(limit = 50): Promise<ActionLogEntry[]> {
   const sb = createSupabaseServerClient();
   const { data } = await sb
     .from("actions_log")
     .select("*")
     .order("created_at", { ascending: false })
     .limit(limit);
+  return (data ?? []) as ActionLogEntry[];
+}
+
+export async function getActionLogFor(targetId: string): Promise<ActionLogEntry[]> {
+  const sb = createSupabaseServerClient();
+  const { data } = await sb
+    .from("actions_log")
+    .select("*")
+    .eq("target_id", targetId)
+    .order("created_at", { ascending: false })
+    .limit(20);
   return (data ?? []) as ActionLogEntry[];
 }

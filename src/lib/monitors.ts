@@ -101,6 +101,14 @@ export function evaluateMonitors(
 // Returns the alerts created this run.
 export async function runMonitors() {
   const admin = createSupabaseAdmin();
+
+  // Auto-wake: any snoozed incident past its wake time returns to the queue.
+  await admin
+    .from("incidents")
+    .update({ status: "Open", snooze_until: null })
+    .eq("status", "Snoozed")
+    .lt("snooze_until", new Date().toISOString());
+
   const [{ data: monitors }, { data: cohorts }, { data: metrics }] = await Promise.all([
     admin.from("monitors").select("*"),
     admin.from("cohorts").select("*"),

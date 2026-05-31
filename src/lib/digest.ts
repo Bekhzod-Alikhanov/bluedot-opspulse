@@ -1,4 +1,3 @@
-import "server-only";
 import type { Cohort, Incident, RiskItem } from "./types";
 import { computeHealth, criticalCount } from "./sla";
 
