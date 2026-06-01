@@ -47,17 +47,27 @@ export interface NewIncidentInput {
 export async function createIncident(input: NewIncidentInput) {
   const a = await actor();
   const admin = createSupabaseAdmin();
+
+  // Validate + clamp untrusted input.
+  const priority = (["P0", "P1", "P2"] as const).includes(input.priority) ? input.priority : "P2";
+  const title = String(input.title ?? "").trim().slice(0, 200);
+  const description = String(input.description ?? "").trim().slice(0, 4000);
+  const action = String(input.action ?? "").trim().slice(0, 2000);
+  const source = String(input.source ?? "").trim().slice(0, 120) || `Manual · ${a.name}`;
+  const slaHours = Math.min(720, Math.max(1, Number(input.slaHours) || 24));
+  if (!title || !description || !action) return { ok: false, error: "Missing required fields" };
+
   const id = `INC-${Math.floor(1000 + Math.random() * 8999)}`;
-  const health = input.priority === "P0" ? 10 : input.priority === "P1" ? 6 : 2;
-  const sla_due = new Date(Date.now() + input.slaHours * 3_600_000).toISOString();
+  const health = priority === "P0" ? 10 : priority === "P1" ? 6 : 2;
+  const sla_due = new Date(Date.now() + slaHours * 3_600_000).toISOString();
   await admin.from("incidents").insert({
     id,
-    title: input.title,
-    priority: input.priority,
+    title,
+    priority,
     status: "Open",
-    source: input.source || `Manual · ${a.name}`,
-    description: input.description,
-    action: input.action,
+    source,
+    description,
+    action,
     health_impact: health,
     cohort_code: input.cohort_code,
     round_id: 4,

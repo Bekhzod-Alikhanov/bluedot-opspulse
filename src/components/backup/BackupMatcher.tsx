@@ -123,7 +123,7 @@ export default function BackupMatcher({ backups }: { backups: BackupFacilitator[
       </div>
 
       {toast && (
-        <div className="panel fixed bottom-6 right-6 z-50 flex max-w-sm items-start gap-3 rounded-xl border-emerald-500/30 p-4 shadow-2xl animate-slide-in">
+        <div role="status" aria-live="polite" className="panel fixed bottom-6 right-6 z-50 flex max-w-sm items-start gap-3 rounded-xl border-emerald-500/30 p-4 shadow-2xl animate-slide-in">
           <Check className="mt-0.5 h-5 w-5 shrink-0 text-emerald-400" />
           <p className="text-xs leading-relaxed text-slate-200">{toast}</p>
         </div>

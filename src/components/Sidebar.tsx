@@ -95,7 +95,7 @@ export default function Sidebar({
             <p className="truncate font-mono text-[10px] text-slate-600">{email}</p>
           </div>
           <form action={signOut}>
-            <button className="rounded-md p-1.5 text-slate-500 transition hover:bg-slate-800 hover:text-rose-300" title="Sign out">
+            <button className="rounded-md p-1.5 text-slate-500 transition hover:bg-slate-800 hover:text-rose-300" title="Sign out" aria-label="Sign out">
               <LogOut className="h-4 w-4" />
             </button>
           </form>

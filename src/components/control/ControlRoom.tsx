@@ -137,7 +137,7 @@ export default function ControlRoom({
               <TrendingDown className="h-3 w-3" /> C11 4.5 &rarr; 2.1
             </span>
           </div>
-          <div className="mt-4 h-[260px]">
+          <div className="mt-4 h-[260px]" role="img" aria-label="Line chart of pulse survey scores by week for all six cohorts. Cohort 11 falls from 4.5 to 2.1 by week 3.">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={pulseData} margin={{ top: 8, right: 8, left: -18, bottom: 0 }}>
                 <CartesianGrid stroke="#1e293b" strokeDasharray="3 3" vertical={false} />
@@ -156,7 +156,7 @@ export default function ControlRoom({
         <div className="panel animate-fade-up rounded-2xl p-5 xl:col-span-2">
           <h2 className="text-sm font-semibold text-slate-200">Onboarding vs. Transfer Requests</h2>
           <p className="font-mono text-[11px] text-slate-500">Welcome-email delivery &amp; cohort-switch demand</p>
-          <div className="mt-4 h-[260px]">
+          <div className="mt-4 h-[260px]" role="img" aria-label="Bar chart comparing welcome-email delivery percentage against transfer-request counts per cohort. Cohort 12 shows 0 percent delivery and 5 transfer requests.">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={onboardingData} margin={{ top: 8, right: 6, left: -22, bottom: 0 }}>
                 <CartesianGrid stroke="#1e293b" strokeDasharray="3 3" vertical={false} />

@@ -7,6 +7,7 @@ import { Menu, X, LogOut } from "lucide-react";
 import { signOut } from "@/app/login/actions";
 import type { Role } from "@/lib/types";
 import { navFor, healthTone } from "@/components/nav/navItems";
+import { useEscape } from "@/components/hooks/useEscape";
 
 export default function MobileNav({
   role,
@@ -25,6 +26,7 @@ export default function MobileNav({
   const [open, setOpen] = useState(false);
   const tone = healthTone(systemHealth);
   const items = navFor(role);
+  useEscape(open, () => setOpen(false));
 
   return (
     <div className="lg:hidden">
@@ -50,8 +52,8 @@ export default function MobileNav({
       {/* Drawer */}
       {open && (
         <div className="fixed inset-0 z-50">
-          <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-0 flex h-full w-[280px] animate-drawer-in flex-col border-l border-slate-800 bg-slate-950 px-5 py-6">
+          <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm" onClick={() => setOpen(false)} aria-hidden="true" />
+          <div role="dialog" aria-modal="true" aria-label="Navigation menu" className="absolute right-0 top-0 flex h-full w-[280px] animate-drawer-in flex-col border-l border-slate-800 bg-slate-950 px-5 py-6">
             <div className="mb-5 flex items-center justify-between">
               <div className="leading-tight">
                 <p className="text-sm font-bold text-slate-50">OpsPulse</p>
@@ -94,7 +96,7 @@ export default function MobileNav({
                 <p className="truncate font-mono text-[10px] text-slate-600">{email}</p>
               </div>
               <form action={signOut}>
-                <button className="rounded-md p-1.5 text-slate-500 hover:bg-slate-800 hover:text-rose-300" title="Sign out"><LogOut className="h-4 w-4" /></button>
+                <button className="rounded-md p-1.5 text-slate-500 hover:bg-slate-800 hover:text-rose-300" title="Sign out" aria-label="Sign out"><LogOut className="h-4 w-4" /></button>
               </form>
             </div>
           </div>

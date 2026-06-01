@@ -91,7 +91,7 @@ export default function Cockpit({
         <div className="panel animate-fade-up rounded-2xl p-5 xl:col-span-3">
           <h2 className="text-sm font-semibold text-slate-200">Cost &amp; Quality by Round</h2>
           <p className="font-mono text-[11px] text-slate-500">Facilitator + vendor spend (bars) vs average pulse (line)</p>
-          <div className="mt-4 h-[280px]">
+          <div className="mt-4 h-[280px]" role="img" aria-label="Combined chart of facilitator and vendor spend as bars with average pulse as a line, across rounds. Round 4 vendor spend spikes to 48000 dollars.">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={chartData} margin={{ top: 8, right: 8, left: -10, bottom: 0 }}>
                 <CartesianGrid stroke="#1e293b" strokeDasharray="3 3" vertical={false} />

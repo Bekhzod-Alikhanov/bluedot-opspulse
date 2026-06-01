@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import type { Cohort, RiskStatus } from "@/lib/types";
 import { stabilizeCohort11, remedyOnboarding12 } from "@/lib/actions";
+import { useEscape } from "@/components/hooks/useEscape";
 
 const RISK_STYLE: Record<RiskStatus, string> = {
   Red: "bg-rose-500/10 text-rose-400 ring-rose-500/30",
@@ -69,8 +70,8 @@ export default function CohortTriage({ cohorts }: { cohorts: Cohort[] }) {
 
       {selected && (
         <div className="fixed inset-0 z-40 flex justify-end">
-          <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm" onClick={() => setSelectedId(null)} />
-          <div className="panel relative h-full w-full max-w-[460px] animate-drawer-in overflow-y-auto border-l border-slate-800 p-6">
+          <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm" onClick={() => setSelectedId(null)} aria-hidden="true" />
+          <div role="dialog" aria-modal="true" aria-label={`${selected.name} actions`} className="panel relative h-full w-full max-w-[460px] animate-drawer-in overflow-y-auto border-l border-slate-800 p-6">
             <Drawer cohort={selected} onClose={() => setSelectedId(null)} />
           </div>
         </div>
@@ -82,6 +83,7 @@ export default function CohortTriage({ cohorts }: { cohorts: Cohort[] }) {
 function Drawer({ cohort, onClose }: { cohort: Cohort; onClose: () => void }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
+  useEscape(true, onClose);
   const pulses = [
     { wk: "W1", v: cohort.pulse.w1 }, { wk: "W2", v: cohort.pulse.w2 },
     { wk: "W3", v: cohort.pulse.w3 }, { wk: "W4", v: cohort.pulse.w4 },

@@ -13,6 +13,7 @@ import {
   updateIncidentNotes, createIncident, type NewIncidentInput,
 } from "@/lib/actions";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { useEscape } from "@/components/hooks/useEscape";
 
 const PRIORITY_STYLE: Record<Priority, string> = {
   P0: "bg-rose-500/15 text-rose-300 ring-rose-500/40",
@@ -195,11 +196,12 @@ function DetailDrawer({
   const sla = slaInfo(incident.sla_due, now);
   const resolved = incident.status === "Resolved";
   const snoozed = incident.status === "Snoozed";
+  useEscape(true, onClose);
 
   return (
     <div className="fixed inset-0 z-40 flex justify-end">
-      <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="panel relative h-full w-full max-w-[480px] animate-drawer-in overflow-y-auto border-l border-slate-800 p-6">
+      <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
+      <div role="dialog" aria-modal="true" aria-label={`Incident ${incident.id}`} className="panel relative h-full w-full max-w-[480px] animate-drawer-in overflow-y-auto border-l border-slate-800 p-6">
         <div className="flex items-start justify-between">
           <div className="flex flex-wrap items-center gap-2">
             <span className={`rounded-md px-2 py-0.5 font-mono text-[10px] font-semibold ring-1 ${PRIORITY_STYLE[incident.priority]}`}>{incident.priority}</span>
@@ -273,14 +275,15 @@ function DetailDrawer({
 function CreateModal({ cohorts, onClose, onCreate }: { cohorts: Cohort[]; onClose: () => void; onCreate: (i: NewIncidentInput) => void }) {
   const [form, setForm] = useState<NewIncidentInput>({ title: "", priority: "P1", source: "", description: "", action: "", cohort_code: null, slaHours: 24 });
   const valid = form.title.trim() && form.description.trim() && form.action.trim();
+  useEscape(true, onClose);
 
   const set = <K extends keyof NewIncidentInput>(k: K, v: NewIncidentInput[K]) => setForm((f) => ({ ...f, [k]: v }));
   const input = "w-full rounded-lg border border-slate-800 bg-slate-950/60 px-3 py-2 text-sm text-slate-200 outline-none placeholder:text-slate-600 focus:border-signal/40";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="panel relative w-full max-w-lg animate-fade-up rounded-2xl p-6">
+      <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
+      <div role="dialog" aria-modal="true" aria-label="New incident" className="panel relative w-full max-w-lg animate-fade-up rounded-2xl p-6">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold text-slate-50">New incident</h2>
           <button onClick={onClose} className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-800 hover:text-slate-200"><X className="h-5 w-5" /></button>
