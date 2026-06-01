@@ -2,8 +2,9 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
 // User-scoped server client (reads honour RLS via the logged-in session).
-export function createSupabaseServerClient() {
-  const cookieStore = cookies();
+// `cookies()` is async in Next 15+, so this returns a Promise.
+export async function createSupabaseServerClient() {
+  const cookieStore = await cookies();
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,

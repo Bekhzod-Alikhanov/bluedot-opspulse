@@ -6,14 +6,14 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 export async function signInWithPassword(_prev: unknown, formData: FormData) {
   const email = String(formData.get("email") ?? "");
   const password = String(formData.get("password") ?? "");
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) return { error: error.message };
   redirect("/");
 }
 
 export async function signInDemo(role: "ops" | "management") {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const email =
     role === "management"
       ? process.env.DEMO_MGMT_EMAIL!
@@ -28,7 +28,7 @@ export async function signInDemo(role: "ops" | "management") {
 }
 
 export async function signOut() {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   await supabase.auth.signOut();
   redirect("/login");
 }

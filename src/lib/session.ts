@@ -3,7 +3,7 @@ import type { Profile } from "./types";
 
 // Current authenticated user + profile (role). Returns null if signed out.
 export async function getSessionProfile(): Promise<Profile | null> {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

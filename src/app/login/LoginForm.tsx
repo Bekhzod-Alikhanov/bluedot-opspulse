@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useFormState } from "react-dom";
+import { useState, useTransition, useActionState } from "react";
 import { Shield, Crown, LogIn, Loader2 } from "lucide-react";
 import { signInWithPassword, signInDemo } from "./actions";
 
 export default function LoginForm() {
-  const [state, formAction] = useFormState(signInWithPassword, null);
+  const [state, formAction] = useActionState(signInWithPassword, null);
   const [pending, startTransition] = useTransition();
   const [demoRole, setDemoRole] = useState<"ops" | "management" | null>(null);
 
