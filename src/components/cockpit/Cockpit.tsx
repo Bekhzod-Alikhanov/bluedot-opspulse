@@ -2,13 +2,14 @@
 
 import { useState, useTransition } from "react";
 import {
-  BarChart3, TrendingUp, PoundSterling, ShieldAlert, Mail, Loader2, Trophy, Send, Eye,
+  BarChart3, TrendingUp, PoundSterling, ShieldAlert, Mail, Loader2, Trophy, Send, Eye, Gauge,
 } from "lucide-react";
 import {
   ResponsiveContainer, ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell,
 } from "recharts";
 import type { Cohort, Incident, RiskItem, Round, RoundMetric } from "@/lib/types";
 import { computeHealth } from "@/lib/sla";
+import { predictRisk, BAND_STYLE } from "@/lib/risk";
 import { previewDigest, sendDigestNow } from "@/lib/actions";
 
 const SEV_STYLE: Record<string, string> = {
@@ -50,6 +51,10 @@ export default function Cockpit({
     .sort((a, b) => b.score - a.score);
 
   const openRisks = risks.filter((r) => r.status !== "Closed");
+
+  const forecasts = [...cohorts]
+    .map((c) => ({ cohort: c, forecast: predictRisk(c) }))
+    .sort((a, b) => b.forecast.score - a.forecast.score);
 
   const kpis = [
     { label: "System Health", value: `${health}%`, icon: TrendingUp, tone: health >= 85 ? "text-emerald-300" : "text-amber-300" },
@@ -127,6 +132,39 @@ export default function Cockpit({
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Predictive risk forecast */}
+      <section className="animate-fade-up">
+        <h2 className="mb-1 flex items-center gap-2 text-sm font-semibold text-slate-200">
+          <Gauge className="h-4 w-4 text-violet-300" /> Predictive Risk Forecast
+        </h2>
+        <p className="mb-3 font-mono text-[11px] text-slate-500">
+          Forward score from pulse trajectory, onboarding health &amp; transfer pressure &mdash; catches decline in week 2, not week 4.
+        </p>
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {forecasts.map(({ cohort: c, forecast: f }) => (
+            <div key={c.code} className="panel rounded-xl p-4">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm font-semibold text-slate-100">{c.code} <span className="font-normal text-slate-500">· {c.facilitator}</span></p>
+                  <p className="mt-0.5 font-mono text-[10px] text-slate-600">driver: {f.driver}</p>
+                </div>
+                <span className={`rounded-md px-2 py-0.5 font-mono text-[10px] font-semibold uppercase ring-1 ${BAND_STYLE[f.band]}`}>{f.band}</span>
+              </div>
+              <div className="mt-3 flex items-center gap-2">
+                <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-800">
+                  <div
+                    className={`h-full rounded-full ${f.score >= 70 ? "bg-rose-400" : f.score >= 50 ? "bg-orange-400" : f.score >= 30 ? "bg-amber-400" : "bg-emerald-400"}`}
+                    style={{ width: `${f.score}%` }}
+                  />
+                </div>
+                <span className="tabular w-9 text-right font-mono text-sm font-semibold text-slate-200">{f.score}</span>
+              </div>
+              <p className="mt-2 text-[11px] leading-relaxed text-slate-500">{f.rationale}</p>
+            </div>
+          ))}
         </div>
       </section>
 

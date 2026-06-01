@@ -2,6 +2,7 @@
 
 import { History, User } from "lucide-react";
 import type { ActionLogEntry } from "@/lib/types";
+import ResetDemoButton from "@/components/ResetDemoButton";
 
 const ACTION_LABEL: Record<string, string> = {
   resolve_incident: "resolved incident",
@@ -33,13 +34,16 @@ function timeAgo(iso: string) {
 export default function ActivityLog({ entries }: { entries: ActionLogEntry[] }) {
   return (
     <div className="space-y-6">
-      <header className="animate-fade-up">
-        <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight text-slate-50">
-          <History className="h-6 w-6 text-signal" /> Activity Log
-        </h1>
-        <p className="mt-1 max-w-2xl text-sm text-slate-400">
-          Every operator action, stamped with who and when. The audit trail that lets leadership trust the room without watching it.
-        </p>
+      <header className="animate-fade-up flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight text-slate-50">
+            <History className="h-6 w-6 text-signal" /> Activity Log
+          </h1>
+          <p className="mt-1 max-w-2xl text-sm text-slate-400">
+            Every operator action, stamped with who and when. The audit trail that lets leadership trust the room without watching it.
+          </p>
+        </div>
+        <ResetDemoButton />
       </header>
 
       {entries.length === 0 ? (

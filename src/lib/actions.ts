@@ -247,6 +247,50 @@ export async function acknowledgeAlert(id: number) {
   return { ok: true };
 }
 
+const SEED_INCIDENTS: [string, number, number][] = [
+  ["INC-2041", -34, 33], ["INC-2038", -3, 80], ["INC-2042", -1, 7],
+  ["INC-2045", -46, 33], ["INC-2039", -10, 14], ["INC-2047", -64, 72],
+  ["INC-2050", -1, 8], ["INC-2051", -11, 48],
+];
+
+// Restore the pristine demo state — usable from the UI so reviewers can reset.
+export async function resetDemoData() {
+  const a = await actor();
+  const admin = createSupabaseAdmin();
+  const hAgo = (h: number) => new Date(Date.now() - h * 3.6e6).toISOString();
+  const hAhead = (h: number) => new Date(Date.now() + h * 3.6e6).toISOString();
+
+  await admin.from("alerts").delete().neq("id", 0);
+  await admin.from("assignments").delete().neq("id", 0);
+  await admin.from("actions_log").delete().neq("id", 0);
+  await admin.from("monitors").update({ last_run: null, last_status: null }).neq("id", "");
+
+  for (const [id, raised, due] of SEED_INCIDENTS) {
+    await admin.from("incidents").update({
+      status: "Open", resolved_at: null, resolved_by: null, assignee: null, notes: null,
+      raised_at: hAgo(-raised), sla_due: hAhead(due),
+    }).eq("id", id);
+  }
+  // Best-effort clear of snooze (no-op if the column hasn't been migrated yet).
+  await admin.from("incidents").update({ snooze_until: null }).neq("id", "");
+
+  // Remove any manually-created incidents.
+  const seedIds = SEED_INCIDENTS.map(([id]) => id);
+  const { data: all } = await admin.from("incidents").select("id");
+  const extra = (all ?? []).map((r) => r.id).filter((id) => !seedIds.includes(id));
+  if (extra.length) await admin.from("incidents").delete().in("id", extra);
+
+  await admin.from("cohorts").update({ risk: "Amber", headline: "Facilitator down with flu as of Monday AM. Thursday 6-8pm session needs cover." }).eq("id", 10);
+  await admin.from("cohorts").update({ risk: "Red", stabilized: false, headline: "SEVERE: pulse collapsed 4.5 to 2.1. Public-exposure threat (Tue), press inquiry, culture complaint." }).eq("id", 11);
+  await admin.from("cohorts").update({ risk: "Red", onboarding_status: "Failed (0/12 sent)", email_delivery_pct: 0, transfer_requests: 5, headline: "Onboarding automation failed silently (0/12 welcome emails). 5 active transfer requests." }).eq("id", 12);
+  await admin.from("backups").update({ status: "Available" }).in("id", ["BF-01", "BF-02", "BF-03", "TF-01"]);
+  await admin.from("backups").update({ status: "Busy" }).in("id", ["BF-04", "TF-02"]);
+
+  revalidateAll();
+  void a;
+  return { ok: true };
+}
+
 export async function previewDigest() {
   const admin = createSupabaseAdmin();
   const [{ data: cohorts }, { data: incidents }, { data: risks }] = await Promise.all([

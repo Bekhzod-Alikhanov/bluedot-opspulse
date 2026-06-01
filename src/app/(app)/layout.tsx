@@ -4,6 +4,7 @@ import { getIncidents } from "@/lib/data";
 import { computeHealth, criticalCount } from "@/lib/sla";
 import Sidebar from "@/components/Sidebar";
 import MobileNav from "@/components/nav/MobileNav";
+import WelcomeTour from "@/components/WelcomeTour";
 
 export const dynamic = "force-dynamic";
 
@@ -35,6 +36,7 @@ export default async function AppLayout({
       <main id="main-content" tabIndex={-1} className="relative flex-1 overflow-x-hidden focus:outline-none">
         <div className="mx-auto max-w-[1320px] px-4 py-6 sm:px-5 lg:px-9 lg:py-7">{children}</div>
       </main>
+      <WelcomeTour />
     </div>
   );
 }
