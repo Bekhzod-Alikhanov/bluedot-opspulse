@@ -24,7 +24,7 @@ const users = [
   {
     email: env.DEMO_MGMT_EMAIL,
     password: env.DEMO_MGMT_PASSWORD,
-    full_name: "Dewi / Li-Lian (Leadership)",
+    full_name: "Leadership (demo)",
     role: "management",
   },
 ];

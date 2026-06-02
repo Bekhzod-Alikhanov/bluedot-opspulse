@@ -8,7 +8,7 @@ import {
 import { invoiceAudit } from "@/lib/finance";
 import { haltAutoPay } from "@/lib/actions";
 
-const ESCALATION = `Hi Li-Lian,
+const ESCALATION = `Hi Head of Product & Eng,
 
 Flagging a finance anomaly before it auto-pays. I have halted the payment in the meantime - no money has moved.
 
@@ -42,7 +42,7 @@ export default function FinanceAuditor({ halted }: { halted: boolean }) {
 
   const halt = () => startTransition(async () => {
     const res = await haltAutoPay();
-    setResult(res?.email?.demoMode ? "Auto-pay halted. Escalation email simulated (add RESEND_API_KEY to send for real)." : "Auto-pay halted. Escalation email sent to Li-Lian.");
+    setResult(res?.email?.demoMode ? "Auto-pay halted. Escalation email simulated (add RESEND_API_KEY to send for real)." : "Auto-pay halted. Escalation email sent to leadership.");
     router.refresh();
   });
 
@@ -116,7 +116,7 @@ export default function FinanceAuditor({ halted }: { halted: boolean }) {
 
       <section className="panel animate-fade-up rounded-2xl p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2"><ReceiptText className="h-4 w-4 text-signal" /><h2 className="text-sm font-semibold text-slate-200">Escalation to Li-Lian (Head of Product &amp; Eng)</h2></div>
+          <div className="flex items-center gap-2"><ReceiptText className="h-4 w-4 text-signal" /><h2 className="text-sm font-semibold text-slate-200">Escalation to Head of Product &amp; Eng</h2></div>
           <button onClick={copy} className="flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-1.5 font-mono text-[11px] text-slate-300 transition hover:border-slate-600 hover:text-slate-100">
             {copied ? <><Check className="h-3.5 w-3.5 text-emerald-400" /> Copied</> : <><Copy className="h-3.5 w-3.5" /> Copy message</>}
           </button>
@@ -125,7 +125,7 @@ export default function FinanceAuditor({ halted }: { halted: boolean }) {
 
         <button onClick={halt} disabled={halted || pending} className={`mt-4 flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold transition ${halted ? "cursor-not-allowed bg-emerald-500/15 text-emerald-300" : "bg-signal text-slate-950 hover:bg-signal-soft"}`}>
           {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : halted ? <Check className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
-          {halted ? "Auto-pay halted · escalation sent" : "Escalate to Li-Lian & Halt Auto-Pay"}
+          {halted ? "Auto-pay halted · escalation sent" : "Escalate to Leadership & Halt Auto-Pay"}
         </button>
         {result && <p className="mt-2 text-center font-mono text-[11px] text-emerald-300">{result}</p>}
         {!result && <p className="mt-2 text-center font-mono text-[10px] text-slate-500">Freezes the payment, resolves the finance ticket, and clears the Pending Invoices KPI.</p>}

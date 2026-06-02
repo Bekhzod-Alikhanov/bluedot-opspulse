@@ -74,7 +74,7 @@ export default function Cockpit({
     <div className="space-y-7">
       <header className="animate-fade-up">
         <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight text-slate-50"><BarChart3 className="h-6 w-6 text-violet-300" /> Leadership Cockpit</h1>
-        <p className="mt-1 max-w-2xl text-sm text-slate-400">For Dewi &amp; Li-Lian: course health across rounds, cost, and the open-risk register — plus the Monday digest. Not a triage console; the decisions that need you, surfaced.</p>
+        <p className="mt-1 max-w-2xl text-sm text-slate-400">For the leadership team: course health across rounds, cost, and the open-risk register — plus the Monday digest. Not a triage console; the decisions that need you, surfaced.</p>
       </header>
 
       <section className="grid grid-cols-2 gap-4 xl:grid-cols-4">

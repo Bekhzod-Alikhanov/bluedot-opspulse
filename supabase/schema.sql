@@ -280,7 +280,7 @@ insert into backups (id, name, role, location, timezone, is_uk, status, cost_per
 
 -- Incidents: the real 9-item pile. sla_due is set relative to now() at seed time.
 insert into incidents (id, title, priority, status, source, description, action, health_impact, cohort_code, round_id, raised_at, sla_due, auto_created) values
-  ('INC-2041','Public-exposure escalation - Cohort 11','P0','Open','Email · Sat 23:48 (cc Dewi, Sam)',
+  ('INC-2041','Public-exposure escalation - Cohort 11','P0','Open','Email · Sat 23:48 (cc Leadership, Sam)',
    'Sarah Chen (senior ML engineer) demands a written response by end of Tuesday or she goes public on EA Forum, LinkedIn and X. Cites lateness, camera off, one-line feedback, and a "world-class facilitators" claim she calls puffery. She has screenshots.',
    'Acknowledge in writing today, commit to a concrete plan for remaining C11 sessions, open a facilitator review, and align marketing copy.',
    12,'C11',4, now() - interval '34 hours', now() + interval '33 hours', false),
@@ -294,7 +294,7 @@ insert into incidents (id, title, priority, status, source, description, action,
    7,'C12',4, now() - interval '1 hour', now() + interval '7 hours', false),
   ('INC-2045','Press inquiry - MIT Technology Review','P1','Open','Email · Sat 09:23',
    'Hannah Liu (MIT Tech Review) is writing on AI-safety education quality at scale. Wants a quote with a number AND specifically asks about Cohort 11 feedback. Deadline end of Tuesday - same clock as the Sarah Chen threat.',
-   'Loop in Dewi/comms before responding. Do not free-style a quote; provide a calibrated holding line on the record.',
+   'Loop in leadership/comms before responding. Do not free-style a quote; provide a calibrated holding line on the record.',
    3,'C11',4, now() - interval '46 hours', now() + interval '33 hours', false),
   ('INC-2039','Anonymous culture complaint - Cohort 11','P2','Open','Email · fwd by Sam, Sun 23:42',
    'Forwarded by Sam: a participant reports a dismissive comment by Jamie about a community they belong to. Not a formal complaint yet - wants someone at BlueDot to know before the next session.',
@@ -302,7 +302,7 @@ insert into incidents (id, title, priority, status, source, description, action,
    1,'C11',4, now() - interval '10 hours', now() + interval '14 hours', false),
   ('INC-2047','Notion Enterprise invoice anomaly','P2','Open','Email · Fri 16:51',
    'Invoice #20451: Notion Enterprise renewal billed at $48,000 vs $4,800 last year - a 10x jump with no explanation in the email body. Auto-pay is armed.',
-   'Halt auto-pay, run root-cause, escalate to Li-Lian with a recommendation before the payment window closes.',
+   'Halt auto-pay, run root-cause, escalate to the Head of Product & Eng with a recommendation before the payment window closes.',
    2,null,4, now() - interval '64 hours', now() + interval '72 hours', false),
   ('INC-2050','Admissions deadline - competing-offer candidate','P1','Open','Admissions queue · Mon 09:00',
    'Two course-owner reviews are pending. One candidate has a competing offer and must decide tomorrow; emailed at 07:00 leaning to the competitor but open to BlueDot if she hears back today. Both are clear yeses on rubric.',
@@ -334,5 +334,5 @@ insert into risk_register (title, owner, severity, likelihood, status, mitigatio
   ('Cohort 11 public-exposure event','Ops Lead','Critical','High','Mitigating','Written response + facilitator review by Tue EOD; comms holding line ready for press.','C11'),
   ('Facilitator quality variance across pool','Sam Dower','High','Medium','Open','Standardise feedback rubric; weekly pulse monitor now auto-flags >1.0 drops.','C11'),
   ('Silent automation failures (onboarding)','Ops Lead','High','Medium','Mitigating','Move to fail-loud monitoring; delivery monitor live; manual fallback documented.','C12'),
-  ('Vendor billing anomalies','Li-Lian','Medium','Medium','Open','Auto-hold invoices >2x trailing baseline; domain-capture audit on Notion.',null),
+  ('Vendor billing anomalies','Head of Product & Eng','Medium','Medium','Open','Auto-hold invoices >2x trailing baseline; domain-capture audit on Notion.',null),
   ('Facilitator availability at short notice','Ops Lead','Medium','High','Open','Maintain 4-person backup pool + 2 Teaching Fellows; matcher tool live.',null);
