@@ -4,7 +4,7 @@ import "./globals.css";
 
 const sora = Sora({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
+  weight: ["400", "500", "600", "700"], // only the weights actually used
   variable: "--font-sora",
   display: "swap",
 });

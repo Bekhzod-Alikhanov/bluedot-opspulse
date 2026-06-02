@@ -1,16 +1,20 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import dynamic from "next/dynamic";
 import {
   BarChart3, TrendingUp, PoundSterling, ShieldAlert, Mail, Loader2, Trophy, Send, Eye, Gauge,
 } from "lucide-react";
-import {
-  ResponsiveContainer, ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell,
-} from "recharts";
 import type { Cohort, Incident, RiskItem, Round, RoundMetric } from "@/lib/types";
 import { computeHealth } from "@/lib/sla";
 import { predictRisk, BAND_STYLE } from "@/lib/risk";
 import { previewDigest, sendDigestNow } from "@/lib/actions";
+
+// Defer Recharts off the cockpit's initial bundle.
+const CostChart = dynamic(() => import("./CostChart"), {
+  ssr: false,
+  loading: () => <div className="h-full w-full animate-pulse rounded-lg bg-slate-800/40" />,
+});
 
 const SEV_STYLE: Record<string, string> = {
   Critical: "bg-rose-500/15 text-rose-300 ring-rose-500/40",
@@ -22,9 +26,6 @@ const STATUS_STYLE: Record<string, string> = {
   Open: "text-rose-300", Mitigating: "text-amber-300", Closed: "text-emerald-300",
 };
 
-function tip() {
-  return { background: "rgba(8,12,22,0.96)", border: "1px solid #1e293b", borderRadius: "10px", fontSize: "12px", fontFamily: "var(--font-plex-mono)", color: "#e2e8f0" };
-}
 
 export default function Cockpit({
   rounds, metrics, cohorts, risks, incidents,
@@ -97,21 +98,7 @@ export default function Cockpit({
           <h2 className="text-sm font-semibold text-slate-200">Cost &amp; Quality by Round</h2>
           <p className="font-mono text-[11px] text-slate-500">Facilitator + vendor spend (bars) vs average pulse (line)</p>
           <div className="mt-4 h-[280px]" role="img" aria-label="Combined chart of facilitator and vendor spend as bars with average pulse as a line, across rounds. Round 4 vendor spend spikes to 48000 dollars.">
-            <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={chartData} margin={{ top: 8, right: 8, left: -10, bottom: 0 }}>
-                <CartesianGrid stroke="#1e293b" strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="round" stroke="#475569" tick={{ fontSize: 11 }} tickLine={false} axisLine={{ stroke: "#1e293b" }} />
-                <YAxis yAxisId="cost" stroke="#475569" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} tickFormatter={(v) => `${v / 1000}k`} />
-                <YAxis yAxisId="pulse" orientation="right" domain={[3, 5]} stroke="#475569" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
-                <Tooltip contentStyle={tip()} cursor={{ fill: "#1e293b33" }} />
-                <Legend wrapperStyle={{ fontSize: "11px" }} />
-                <Bar yAxisId="cost" dataKey="facilitator" name="Facilitator £" fill="#38bdf8" fillOpacity={0.7} radius={[3, 3, 0, 0]} maxBarSize={26} />
-                <Bar yAxisId="cost" dataKey="vendor" name="Vendor $" radius={[3, 3, 0, 0]} maxBarSize={26}>
-                  {chartData.map((d) => <Cell key={d.round} fill={d.vendor > 10000 ? "#fb7185" : "#64748b"} />)}
-                </Bar>
-                <Line yAxisId="pulse" type="monotone" dataKey="pulse" name="Avg pulse" stroke="#34d399" strokeWidth={2.5} dot={{ r: 3 }} />
-              </ComposedChart>
-            </ResponsiveContainer>
+            <CostChart data={chartData} />
           </div>
           <p className="mt-1 font-mono text-[11px] text-rose-300/80">R4 vendor spend spikes to $48k — the Notion anomaly, visible at a glance.</p>
         </div>
