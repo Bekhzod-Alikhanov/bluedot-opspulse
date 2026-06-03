@@ -73,7 +73,7 @@ export default function MobileNav({
                 <span className={`font-mono text-2xl font-bold ${tone.text}`}>{systemHealth}</span>
                 <span className="font-mono text-xs text-slate-500">%</span>
               </div>
-              <p className="mt-1 font-mono text-[11px] text-slate-500">{criticalAlerts} critical open</p>
+              <p className="mt-1 font-mono text-[11px] text-slate-500">{criticalAlerts} P0/P1 open</p>
             </div>
 
             <nav className="flex flex-1 flex-col gap-1 overflow-y-auto">

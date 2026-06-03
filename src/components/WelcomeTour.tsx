@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Radar, Inbox, BellRing, BarChart3, HelpCircle, X, ArrowRight, ArrowLeft } from "lucide-react";
 import { useEscape } from "@/components/hooks/useEscape";
 
@@ -10,7 +10,7 @@ const STEPS = [
   {
     icon: Radar,
     title: "It's 9am Monday in London",
-    body: "You're the Course Operations Lead for the Technical AI Safety course. The course lead is away until Wednesday, and a weekend's worth of escalations, a facilitator emergency, and a 10x invoice have piled up. OpsPulse is where you triage it — and act.",
+    body: "You're the Course Operations Lead for the Technical AI Safety course. The course lead is away, and a weekend's worth of escalations, a facilitator emergency, and a 10x invoice have piled up. OpsPulse opens with the Monday Decision Brief: what matters, why, who owns it, and what happens next.",
   },
   {
     icon: Inbox,
@@ -19,32 +19,33 @@ const STEPS = [
   },
   {
     icon: BellRing,
-    title: "Monitors catch the silent failures",
-    body: "Prevention, not just firefighting. Continuous checks flag a pulse collapse or a 0%-delivery onboarding before Monday. Hit 'Run checks now' on Monitors & Alerts to see them fire.",
+    title: "Systemic fix is shipped",
+    body: "Prevention, not just firefighting. The Systemic Fix page turns the Monday Course Health Sweep into a reusable checklist, and Monitors & Alerts shows the signals it should catch before next Monday.",
   },
   {
     icon: BarChart3,
     title: "Two roles, two views",
-    body: "Sign in as Ops Lead for the daily triage, or as Management for the leadership cockpit — round-over-round trends, cost, predictive risk, and the Monday digest. Slack/email actions are simulated in this demo (no live accounts needed).",
+    body: "Sign in as Ops Lead for triage, shipped drafts, finance, backup, and the health sweep. Management gets the leadership cockpit with trends, cost, predictive risk, and the Monday digest. Slack/email actions are simulated in this demo.",
   },
 ];
 
 export default function WelcomeTour() {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(0);
-  useEscape(open, () => close());
 
-  useEffect(() => {
-    if (typeof window !== "undefined" && !localStorage.getItem(KEY)) {
-      setOpen(true);
-    }
-  }, []);
-
-  const close = () => {
+  const close = useCallback(() => {
     setOpen(false);
     setStep(0);
     if (typeof window !== "undefined") localStorage.setItem(KEY, "1");
-  };
+  }, []);
+
+  useEscape(open, close);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || localStorage.getItem(KEY)) return;
+    const id = window.setTimeout(() => setOpen(true), 0);
+    return () => window.clearTimeout(id);
+  }, []);
 
   const replay = () => {
     setStep(0);
@@ -58,7 +59,7 @@ export default function WelcomeTour() {
         onClick={replay}
         aria-label="Replay the welcome tour"
         title="What is this?"
-        className="fixed bottom-5 left-5 z-30 flex h-10 w-10 items-center justify-center rounded-full border border-slate-700 bg-slate-900/80 text-slate-300 shadow-lg backdrop-blur transition hover:border-signal/50 hover:text-signal lg:bottom-6 lg:left-6"
+        className="fixed bottom-5 left-5 z-30 hidden h-10 w-10 items-center justify-center rounded-full border border-slate-700 bg-slate-900/80 text-slate-300 shadow-lg backdrop-blur transition hover:border-signal/50 hover:text-signal sm:flex lg:bottom-6 lg:left-6"
       >
         <HelpCircle className="h-5 w-5" />
       </button>

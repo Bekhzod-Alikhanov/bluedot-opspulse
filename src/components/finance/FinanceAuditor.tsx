@@ -3,27 +3,30 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
-  ReceiptText, TrendingUp, Search, Copy, Check, ShieldX, AlertTriangle, Lock, Loader2,
+  ReceiptText, TrendingUp, Search, Copy, Check, ShieldCheck, AlertTriangle, Lock, Loader2,
 } from "lucide-react";
 import { invoiceAudit } from "@/lib/finance";
 import { haltAutoPay } from "@/lib/actions";
 
+const formatInteger = (value: number) => value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+const formatUsd = (value: number) => `$${formatInteger(value)}`;
+
 const ESCALATION = `Hi Head of Product & Eng,
 
-Flagging a finance anomaly before it auto-pays. I have halted the payment in the meantime - no money has moved.
+Flagging a finance anomaly before it auto-pays. I have paused the payment in the meantime - no money has moved.
 
-Notion Enterprise renewal (invoice ${invoiceAudit.invoiceNo}) came in at $48,000 vs $4,800 last year - a 10x jump with no explanation in the email body.
+Notion Enterprise renewal (invoice ${invoiceAudit.invoiceNo}) came in at $48,000 vs $4,800 last year - a 10x jump with no explanation in the email body. I am not treating the sender email as trusted until we verify it through a known Notion admin or saved finance contact.
 
-Root cause (from our audit): an unmonitored domain-capture setting auto-provisioned ~215 premium Enterprise seats for external R4 applicants who signed up with addresses on our verified domains. Only ~32 are genuine team seats.
+Working hypothesis to verify: a domain-capture setting may have auto-provisioned ~215 premium Enterprise seats for external R4 applicants who signed up with addresses on our verified domains. Only ~32 appear to be genuine team seats.
 
 What I have done:
 - Halted auto-pay on invoice ${invoiceAudit.invoiceNo}.
-- Disabled domain capture in the Notion admin console.
-- Drafted a reclaim request for the 215 phantom seats.
+- Will verify sender/vendor through known channels before replying to the invoice thread.
+- Started a seat export reconciliation against the genuine staff seat list.
 
 What I need from you:
-- A quick sign-off to request a corrected invoice (~$4,800-6,000).
-- A steer on whether Finance owns the vendor conversation or leaves it with Ops.
+- A quick sign-off to pursue a corrected invoice if the vendor and seat export checks confirm the hypothesis.
+- A steer on whether Finance owns the vendor conversation or leaves it with Ops after verification.
 
 Needs a decision before the payment window closes Thursday. Happy to jump on a 10-min call.
 
@@ -50,24 +53,24 @@ export default function FinanceAuditor({ halted }: { halted: boolean }) {
     <div className="space-y-6">
       <header className="animate-fade-up">
         <h1 className="text-2xl font-bold tracking-tight text-slate-50">Financial Hygiene</h1>
-        <p className="mt-1 text-sm text-slate-400">One invoice tripped the anomaly threshold. Audit the jump, halt the payment, and escalate with a recommendation — before auto-pay fires.</p>
+        <p className="mt-1 text-sm text-slate-400">One invoice tripped the anomaly threshold. Pause payment, verify the sender, and escalate a cautious working hypothesis before auto-pay fires.</p>
       </header>
 
       <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <div className="panel animate-fade-up rounded-2xl p-5">
           <p className="font-mono text-[10px] uppercase tracking-widest text-slate-500">Last year</p>
-          <p className="tabular mt-3 font-mono text-3xl font-bold text-slate-200">${invoiceAudit.lastYear.toLocaleString()}</p>
+          <p className="tabular mt-3 font-mono text-3xl font-bold text-slate-200">{formatUsd(invoiceAudit.lastYear)}</p>
           <p className="mt-1 text-xs text-slate-500">{invoiceAudit.vendor} renewal</p>
         </div>
         <div className="panel crit-glow animate-fade-up rounded-2xl p-5">
           <p className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-rose-300"><AlertTriangle className="h-3 w-3" /> This year</p>
-          <p className="tabular mt-3 font-mono text-3xl font-bold text-rose-300">${invoiceAudit.thisYear.toLocaleString()}</p>
-          <p className="mt-1 text-xs text-slate-500">Invoice {invoiceAudit.invoiceNo} · auto-pay {halted ? <span className="text-emerald-300">halted</span> : <span className="text-amber-300">armed</span>}</p>
+          <p className="tabular mt-3 font-mono text-3xl font-bold text-rose-300">{formatUsd(invoiceAudit.thisYear)}</p>
+          <p className="mt-1 text-xs text-slate-500">Invoice {invoiceAudit.invoiceNo} - auto-pay {halted ? <span className="text-emerald-300">halted</span> : <span className="text-amber-300">armed</span>}</p>
         </div>
         <div className="panel animate-fade-up rounded-2xl p-5">
           <p className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-slate-500"><TrendingUp className="h-3 w-3" /> Variance</p>
           <p className="tabular mt-3 font-mono text-3xl font-bold text-amber-300">{invoiceAudit.multiplier}&times;</p>
-          <p className="mt-1 text-xs text-slate-500">+${invoiceAudit.delta.toLocaleString()} unexplained</p>
+          <p className="mt-1 text-xs text-slate-500">+{formatUsd(invoiceAudit.delta)} unexplained</p>
         </div>
       </section>
 
@@ -75,11 +78,20 @@ export default function FinanceAuditor({ halted }: { halted: boolean }) {
         <div className="flex items-center gap-2">
           <span className="rounded-lg bg-sky-500/10 p-1.5 ring-1 ring-sky-500/30"><Search className="h-4 w-4 text-sky-300" /></span>
           <div>
-            <h2 className="text-sm font-semibold text-slate-200">Automated Root-Cause Analysis</h2>
-            <p className="font-mono text-[11px] text-slate-500">Seat-level reconciliation · Notion admin export</p>
+            <h2 className="text-sm font-semibold text-slate-200">Verification + Working Hypothesis</h2>
+            <p className="font-mono text-[11px] text-slate-500">Known-channel vendor check - seat-level reconciliation</p>
           </div>
         </div>
         <p className="mt-4 rounded-lg bg-slate-900/60 p-3 text-sm leading-relaxed text-slate-300">{invoiceAudit.rootCause}</p>
+
+        <div className="mt-4 grid gap-2 md:grid-cols-2">
+          {invoiceAudit.verification.map((step) => (
+            <div key={step} className="flex items-start gap-2 rounded-lg border border-slate-800 bg-slate-900/35 p-3">
+              <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-300" />
+              <p className="text-xs leading-relaxed text-slate-300">{step}</p>
+            </div>
+          ))}
+        </div>
 
         <div className="mt-4 overflow-hidden rounded-xl border border-slate-800">
           <table className="w-full text-left text-sm">
@@ -91,10 +103,10 @@ export default function FinanceAuditor({ halted }: { halted: boolean }) {
                 const flagged = row.seats === 215;
                 return (
                   <tr key={row.label} className={flagged ? "bg-rose-500/5" : ""}>
-                    <td className="px-4 py-3 text-slate-300">{flagged && <span className="mr-2 inline-block rounded bg-rose-500/15 px-1.5 py-0.5 font-mono text-[9px] uppercase text-rose-300">phantom</span>}{row.label}</td>
+                    <td className="px-4 py-3 text-slate-300">{flagged && <span className="mr-2 inline-block rounded bg-amber-500/15 px-1.5 py-0.5 font-mono text-[9px] uppercase text-amber-300">verify</span>}{row.label}</td>
                     <td className="px-4 py-3 text-right font-mono text-slate-400">{row.seats || "—"}</td>
                     <td className="px-4 py-3 text-right font-mono text-slate-400">{row.unit ? `$${row.unit}` : "—"}</td>
-                    <td className={`px-4 py-3 text-right font-mono ${flagged ? "text-rose-300" : "text-slate-300"}`}>${row.amount.toLocaleString()}</td>
+                    <td className={`px-4 py-3 text-right font-mono ${flagged ? "text-rose-300" : "text-slate-300"}`}>{formatUsd(row.amount)}</td>
                   </tr>
                 );
               })}
@@ -102,14 +114,14 @@ export default function FinanceAuditor({ halted }: { halted: boolean }) {
                 <td className="px-4 py-3 text-slate-200">Total billed</td>
                 <td className="px-4 py-3 text-right font-mono text-slate-400">{invoiceAudit.totalSeats}</td>
                 <td className="px-4 py-3" />
-                <td className="px-4 py-3 text-right font-mono text-rose-300">${invoiceAudit.thisYear.toLocaleString()}</td>
+                <td className="px-4 py-3 text-right font-mono text-rose-300">{formatUsd(invoiceAudit.thisYear)}</td>
               </tr>
             </tbody>
           </table>
         </div>
 
         <div className="mt-4 flex items-start gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3">
-          <ShieldX className="mt-0.5 h-4 w-4 shrink-0 text-emerald-300" />
+          <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-300" />
           <p className="text-xs leading-relaxed text-slate-300"><span className="font-semibold text-emerald-200">Recommendation:</span> {invoiceAudit.recommendation}</p>
         </div>
       </section>
@@ -125,7 +137,7 @@ export default function FinanceAuditor({ halted }: { halted: boolean }) {
 
         <button onClick={halt} disabled={halted || pending} className={`mt-4 flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold transition ${halted ? "cursor-not-allowed bg-emerald-500/15 text-emerald-300" : "bg-signal text-slate-950 hover:bg-signal-soft"}`}>
           {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : halted ? <Check className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
-          {halted ? "Auto-pay halted · escalation sent" : "Escalate to Leadership & Halt Auto-Pay"}
+          {halted ? "Auto-pay halted - escalation sent" : "Escalate to Leadership & Halt Auto-Pay"}
         </button>
         {result && <p className="mt-2 text-center font-mono text-[11px] text-emerald-300">{result}</p>}
         {!result && <p className="mt-2 text-center font-mono text-[10px] text-slate-500">Freezes the payment, resolves the finance ticket, and clears the Pending Invoices KPI.</p>}

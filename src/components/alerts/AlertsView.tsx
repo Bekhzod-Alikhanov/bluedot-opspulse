@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import type { Alert, Monitor, Priority } from "@/lib/types";
 import { runMonitorsAction, acknowledgeAlert } from "@/lib/actions";
+import { monitorPreviewFindings } from "@/lib/workTestBrief";
 
 const SEV: Record<Priority, string> = {
   P0: "bg-rose-500/15 text-rose-300 ring-rose-500/40",
@@ -68,7 +69,27 @@ export default function AlertsView({ monitors, alerts }: { monitors: Monitor[]; 
       <section>
         <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-200"><Zap className="h-4 w-4 text-amber-400" /> Alert feed{open.length > 0 && <span className="font-mono text-[11px] text-slate-500">({open.length} open)</span>}</h2>
         {open.length === 0 && ackd.length === 0 && (
-          <div className="panel rounded-xl p-8 text-center text-sm text-slate-400">No alerts yet. Hit <span className="text-signal">Run checks now</span> to evaluate every monitor against live data.</div>
+          <div className="panel rounded-xl p-5">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <p className="text-sm font-semibold text-slate-100">Preview: what the Monday sweep catches</p>
+                <p className="mt-1 text-xs text-slate-500">Hit <span className="text-signal">Run checks now</span> to create live alerts; these seeded findings show the expected signal when the feed is empty.</p>
+              </div>
+            </div>
+            <div className="mt-4 grid grid-cols-1 gap-2 lg:grid-cols-2">
+              {monitorPreviewFindings.map((finding) => (
+                <article key={finding.id} className="rounded-lg border border-slate-800 bg-slate-900/45 p-3">
+                  <div className="flex items-center gap-2">
+                    <span className={`rounded-md px-2 py-0.5 font-mono text-[10px] font-semibold ring-1 ${SEV[finding.severity]}`}>{finding.severity}</span>
+                    {finding.cohortCode && <span className="font-mono text-[10px] text-slate-500">{finding.cohortCode}</span>}
+                    <span className="font-mono text-[10px] text-slate-600">{finding.monitor}</span>
+                  </div>
+                  <h3 className="mt-1.5 text-sm font-semibold text-slate-100">{finding.title}</h3>
+                  <p className="mt-1 text-xs leading-relaxed text-slate-400">{finding.detail}</p>
+                </article>
+              ))}
+            </div>
+          </div>
         )}
         <div className="space-y-2.5">
           {open.map((a) => (

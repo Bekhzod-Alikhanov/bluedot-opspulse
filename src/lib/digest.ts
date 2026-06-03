@@ -21,7 +21,7 @@ export function composeDigest(opts: {
   lines.push("OPSPULSE — MONDAY LEADERSHIP DIGEST");
   lines.push("Technical AI Safety · Round 4 · Week 4 of 5");
   lines.push("");
-  lines.push(`SYSTEM HEALTH: ${health}%  (${critical} critical incidents open)`);
+  lines.push(`SYSTEM HEALTH: ${health}%  (${critical} P0/P1 items open)`);
   lines.push(`AT-RISK COHORTS: ${red.length ? red.map((c) => c.code).join(", ") : "none"}`);
   lines.push("");
   lines.push("NEEDS A DECISION FROM YOU:");
@@ -33,5 +33,5 @@ export function composeDigest(opts: {
   lines.push("");
   lines.push("Full detail in the cockpit. Reply here to task Ops directly.");
 
-  return { subject: `OpsPulse digest — health ${health}%, ${critical} critical`, body: lines.join("\n") };
+  return { subject: `OpsPulse digest - health ${health}%, ${critical} P0/P1 items`, body: lines.join("\n") };
 }

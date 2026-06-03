@@ -9,11 +9,12 @@ import type { BackupFacilitator } from "@/lib/types";
 import { assignBackup } from "@/lib/actions";
 
 const SHIFTS = [
-  { key: "thu-18", label: "Thursday 6-8pm UK", cohortCode: "C10", reason: "Tom Reeves — flu cover" },
-  { key: "fri-16", label: "Friday 4-6pm UK", cohortCode: "C11", reason: "Jamie Whitford — suspended pending review" },
+  { key: "thu-18", label: "Thursday 6-8pm UK", cohortCode: "C10", reason: "Tom Reeves - flu cover" },
+  { key: "fri-16", label: "Friday 4-6pm UK", cohortCode: "C11", reason: "Jamie Whitford - paused pending review" },
 ];
 
 const isMatch = (b: BackupFacilitator) => b.is_uk && b.status === "Available";
+const isPrimaryBackup = (b: BackupFacilitator) => isMatch(b) && b.role === "Backup Facilitator";
 
 export default function BackupMatcher({ backups }: { backups: BackupFacilitator[] }) {
   const router = useRouter();
@@ -25,9 +26,14 @@ export default function BackupMatcher({ backups }: { backups: BackupFacilitator[
 
   const ranked = [...backups].sort((a, b) => {
     const am = isMatch(a) ? 0 : 1, bm = isMatch(b) ? 0 : 1;
-    return am !== bm ? am - bm : b.rating - a.rating;
+    if (am !== bm) return am - bm;
+    const ar = a.role === "Backup Facilitator" ? 0 : 1;
+    const br = b.role === "Backup Facilitator" ? 0 : 1;
+    if (ar !== br) return ar - br;
+    if (a.cost_per_session !== b.cost_per_session) return a.cost_per_session - b.cost_per_session;
+    return b.rating - a.rating;
   });
-  const matchCount = backups.filter(isMatch).length;
+  const matchCount = backups.filter(isPrimaryBackup).length;
 
   const assign = (b: BackupFacilitator) => {
     setPendingId(b.id);
@@ -41,7 +47,7 @@ export default function BackupMatcher({ backups }: { backups: BackupFacilitator[
         URL.revokeObjectURL(url);
       }
       const mode = res?.slack?.demoMode ? " (Slack simulated)" : " (Slack sent)";
-      setToast(`${b.name} booked for ${gap.label} at £${b.cost_per_session}.${mode} Calendar hold downloaded.`);
+      setToast(`${b.name} booked for ${gap.label} at GBP${b.cost_per_session}.${mode} Calendar hold downloaded.`);
       router.refresh();
       setPendingId(null);
       setTimeout(() => setToast(null), 5000);
@@ -52,7 +58,7 @@ export default function BackupMatcher({ backups }: { backups: BackupFacilitator[
     <div className="space-y-6">
       <header className="animate-fade-up">
         <h1 className="text-2xl font-bold tracking-tight text-slate-50">Backup Matcher</h1>
-        <p className="mt-1 text-sm text-slate-400">Clear the two open facilitator gaps. Pick a shift to filter the pool by timezone and availability, then book at the £80 rate.</p>
+        <p className="mt-1 text-sm text-slate-400">Clear the two open facilitator gaps. Pick a shift to filter the pool by timezone and availability, then book at the GBP80 rate.</p>
       </header>
 
       <div className="panel animate-fade-up rounded-2xl p-5">
@@ -71,14 +77,14 @@ export default function BackupMatcher({ backups }: { backups: BackupFacilitator[
             );
           })}
         </div>
-        <p className="mt-3 font-mono text-[11px] text-slate-500">{matchCount} facilitator{matchCount === 1 ? "" : "s"} match <span className="text-slate-300">{gap.label}</span> — UK timezone &amp; available.</p>
+        <p className="mt-3 font-mono text-[11px] text-slate-500">{matchCount} GBP80 backup facilitator{matchCount === 1 ? "" : "s"} match <span className="text-slate-300">{gap.label}</span> - UK timezone &amp; available. Teaching Fellows stay visible as reserve.</p>
       </div>
 
       <div className="space-y-3">
         {ranked.map((b, idx) => {
           const matched = isMatch(b);
           const busy = pendingId === b.id;
-          const reasonOut = !b.is_uk ? `${b.timezone} — outside UK window` : b.status === "Busy" ? "Currently busy" : "Unavailable";
+          const reasonOut = !b.is_uk ? `${b.timezone} - outside UK window` : b.status === "Busy" ? "Currently busy" : "Unavailable";
           return (
             <div key={b.id} style={{ animationDelay: `${idx * 40}ms` }} className={`panel animate-fade-up flex flex-col gap-4 rounded-xl p-4 sm:flex-row sm:items-center sm:justify-between ${matched ? "ring-1 ring-signal/40" : "opacity-70"}`}>
               <div className="flex items-start gap-3">
@@ -99,12 +105,12 @@ export default function BackupMatcher({ backups }: { backups: BackupFacilitator[
                 </div>
               </div>
               <div className="flex shrink-0 items-center gap-3 sm:flex-col sm:items-end">
-                <span className="font-mono text-sm font-semibold text-slate-200">£{b.cost_per_session}<span className="text-[10px] text-slate-500">/session</span></span>
+                <span className="font-mono text-sm font-semibold text-slate-200">GBP{b.cost_per_session}<span className="text-[10px] text-slate-500">/session</span></span>
                 {b.status === "Busy" ? (
                   <span className="flex items-center gap-1.5 rounded-lg bg-slate-800/70 px-3 py-2 font-mono text-[11px] text-slate-400"><Clock4 className="h-3.5 w-3.5" /> Busy</span>
                 ) : matched ? (
                   <button onClick={() => assign(b)} disabled={busy} className="flex items-center gap-1.5 rounded-lg bg-signal px-3.5 py-2 text-[13px] font-semibold text-slate-950 transition hover:bg-signal-soft disabled:opacity-60">
-                    {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />} Assign &amp; Send Slack Alert
+                    {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />} {b.role === "Teaching Fellow" ? "Use Reserve & Alert" : "Assign & Send Slack Alert"}
                   </button>
                 ) : (
                   <span className="flex items-center gap-1.5 rounded-lg border border-slate-800 px-3 py-2 font-mono text-[10px] text-slate-500">{reasonOut}</span>
@@ -118,7 +124,7 @@ export default function BackupMatcher({ backups }: { backups: BackupFacilitator[
       <div className="panel flex items-start gap-3 rounded-xl p-4">
         <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-violet-300" />
         <p className="text-xs leading-relaxed text-slate-400">
-          <span className="font-semibold text-slate-200">Escalation path:</span> two Teaching Fellows (£120) can cover at short notice, but pulling them stalls cohort-design work. Prefer the £80 backups; reserve Fellows for a genuine no-show.
+          <span className="font-semibold text-slate-200">Escalation path:</span> two Teaching Fellows (GBP120) can cover at short notice, but pulling them stalls cohort-design work. Prefer the GBP80 backups; reserve Fellows for a genuine no-show.
         </p>
       </div>
 

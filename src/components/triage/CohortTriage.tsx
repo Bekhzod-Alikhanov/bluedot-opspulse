@@ -126,7 +126,7 @@ function Drawer({ cohort, onClose }: { cohort: Cohort; onClose: () => void }) {
       <div className="mt-6">
         {cohort.id === 11 ? (
           cohort.stabilized ? (
-            <Resolved title="Cohort 11 stabilized" lines={["Jamie suspended pending facilitator review.", "UK backup queued for Friday 4-6pm (see Backup Matcher).", "Written response to Sarah Chen drafted — send before Tuesday EOD."]} />
+            <Resolved title="Cohort 11 stabilized" lines={["Jamie paused pending facilitator review.", "UK backup queued for Friday 4-6pm (see Backup Matcher).", "Written response to Sarah Chen drafted - send before Tuesday EOD."]} />
           ) : (
             <div className="rounded-xl border border-rose-500/30 bg-rose-500/5 p-4">
               <p className="flex items-center gap-2 text-sm font-semibold text-rose-200"><ShieldAlert className="h-4 w-4" /> Escalation — Sarah Chen</p>
@@ -136,7 +136,7 @@ function Drawer({ cohort, onClose }: { cohort: Cohort; onClose: () => void }) {
                 <li>• Compounded by an anonymous culture complaint + MIT Tech Review inquiry.</li>
               </ul>
               <button onClick={() => run(stabilizeCohort11)} disabled={pending} className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-rose-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-rose-400 disabled:opacity-60">
-                {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserX className="h-4 w-4" />} Suspend Jamie &amp; Deploy Backup
+                {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserX className="h-4 w-4" />} Pause Jamie &amp; Deploy Cover
               </button>
               <p className="mt-2 text-center font-mono text-[10px] text-slate-500">Clears the P0 cluster, posts to Slack, recalculates System Health.</p>
             </div>

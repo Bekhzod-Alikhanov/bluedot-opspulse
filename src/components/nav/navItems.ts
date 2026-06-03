@@ -1,6 +1,6 @@
 import {
   Radar, Inbox, LayoutGrid, CalendarClock, ReceiptText, BellRing, BarChart3,
-  FileText, History,
+  FileText, History, ClipboardCheck,
 } from "lucide-react";
 import type { Role } from "@/lib/types";
 
@@ -19,9 +19,10 @@ export const NAV: NavItem[] = [
   { href: "/backup", label: "Backup Matcher", sub: "Scheduling", icon: CalendarClock, roles: ["ops"] },
   { href: "/finance", label: "Financial Hygiene", sub: "Invoice audit", icon: ReceiptText, roles: ["ops"] },
   { href: "/alerts", label: "Monitors & Alerts", sub: "Prevention", icon: BellRing, roles: ["ops", "management"] },
+  { href: "/systemic", label: "Systemic Fix", sub: "Health sweep", icon: ClipboardCheck, roles: ["ops", "management"] },
   { href: "/cockpit", label: "Leadership Cockpit", sub: "Trends & risk", icon: BarChart3, roles: ["management"] },
   { href: "/activity", label: "Activity Log", sub: "Audit trail", icon: History, roles: ["ops", "management"] },
-  { href: "/templates", label: "Comms Library", sub: "Templates", icon: FileText, roles: ["ops", "management"] },
+  { href: "/templates", label: "Drafts Shipped", sub: "Comms", icon: FileText, roles: ["ops", "management"] },
 ];
 
 export function healthTone(h: number) {

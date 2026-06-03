@@ -6,6 +6,7 @@ import { Users, Gauge, Siren, ReceiptText, ArrowUpRight, Radio } from "lucide-re
 import type { Cohort, Incident, Alert, Priority } from "@/lib/types";
 import { SYSTEM } from "@/lib/types";
 import { computeHealth, criticalCount, pendingInvoices, rankIncidents } from "@/lib/sla";
+import { decisionBrief } from "@/lib/workTestBrief";
 
 // Recharts is heavy — load it after first paint so the KPIs + feed render fast.
 const Charts = dynamic(() => import("./Charts"), {
@@ -45,7 +46,7 @@ export default function ControlRoom({
   const kpis = [
     { label: "Active Learners", value: SYSTEM.totalStudents, sub: `${SYSTEM.totalCohorts} cohorts · Round ${SYSTEM.round}`, icon: Users, tone: "text-sky-300", ring: "ring-sky-500/20" },
     { label: "System Health Index", value: `${health}%`, sub: health >= 85 ? "Nominal" : "Below target — action required", icon: Gauge, tone: health >= 85 ? "text-emerald-300" : "text-amber-300", ring: health >= 85 ? "ring-emerald-500/20" : "ring-amber-500/20" },
-    { label: "Active Critical Alerts", value: critical, sub: "Open P0 + P1 incidents", icon: Siren, tone: critical > 0 ? "text-rose-300" : "text-emerald-300", ring: critical > 0 ? "ring-rose-500/20" : "ring-emerald-500/20" },
+    { label: "P0/P1 Items", value: critical, sub: "Time-sensitive open items", icon: Siren, tone: critical > 0 ? "text-rose-300" : "text-emerald-300", ring: critical > 0 ? "ring-rose-500/20" : "ring-emerald-500/20" },
     { label: "Pending Invoices", value: pending, sub: pending > 0 ? "Anomaly awaiting sign-off" : "Cleared", icon: ReceiptText, tone: pending > 0 ? "text-amber-300" : "text-emerald-300", ring: pending > 0 ? "ring-amber-500/20" : "ring-emerald-500/20" },
   ];
 
@@ -57,11 +58,60 @@ export default function ControlRoom({
         </div>
         <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-50">Control Room</h1>
         <p className="mt-1 max-w-2xl text-sm text-slate-400">
-          The weekend pile, triaged. {critical} critical {critical === 1 ? "thread" : "threads"} live,
+          The weekend pile, triaged. {critical} P0/P1 {critical === 1 ? "item" : "items"} live,
           {" "}{openAlerts} monitor {openAlerts === 1 ? "alert" : "alerts"} open, two facilitator gaps,
           and a 10&times; invoice anomaly to halt.
         </p>
       </header>
+
+      <section className="panel animate-fade-up overflow-hidden rounded-2xl">
+        <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-800/80 px-5 py-4">
+          <div>
+            <h2 className="text-sm font-semibold text-slate-100">Monday Decision Brief</h2>
+            <p className="mt-1 max-w-2xl text-xs leading-relaxed text-slate-400">
+              The 9-item pile mapped to priority, owner, deadline, and next action. This is the judgment layer before any button gets clicked.
+            </p>
+          </div>
+          <Link href="/systemic" className="flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-1.5 font-mono text-[11px] text-slate-300 transition hover:border-slate-600 hover:text-signal">
+            Open health sweep <ArrowUpRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[980px] text-left text-sm">
+            <thead className="bg-slate-950/40 font-mono text-[10px] uppercase tracking-widest text-slate-500">
+              <tr>
+                <th className="w-24 px-4 py-2.5">Item</th>
+                <th className="w-20 px-4 py-2.5">Pri</th>
+                <th className="px-4 py-2.5">Signal</th>
+                <th className="px-4 py-2.5">Why it matters</th>
+                <th className="w-44 px-4 py-2.5">Owner</th>
+                <th className="w-44 px-4 py-2.5">Deadline</th>
+                <th className="w-32 px-4 py-2.5">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-800/80">
+              {decisionBrief.map((row) => (
+                <tr key={row.id} className="align-top">
+                  <td className="px-4 py-3 font-mono text-[11px] text-slate-500">{row.item}</td>
+                  <td className="px-4 py-3">
+                    <span className={`rounded-md px-2 py-0.5 font-mono text-[10px] font-semibold ring-1 ${PRIORITY_STYLE[row.priority]}`}>{row.priority}</span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <p className="font-semibold text-slate-100">{row.title}</p>
+                    <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-slate-500">{row.action}</p>
+                  </td>
+                  <td className="px-4 py-3 text-xs leading-relaxed text-slate-400">{row.why}</td>
+                  <td className="px-4 py-3 font-mono text-[11px] text-slate-400">{row.owner}</td>
+                  <td className="px-4 py-3 font-mono text-[11px] text-slate-400">{row.deadline}</td>
+                  <td className="px-4 py-3">
+                    <span className="rounded bg-slate-800 px-2 py-0.5 font-mono text-[10px] text-slate-300">{row.status}</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
 
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {kpis.map((k, i) => {
@@ -95,7 +145,7 @@ export default function ControlRoom({
         <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
           {feed.length === 0 && (
             <div className="panel rounded-xl p-6 text-center text-sm text-emerald-300">
-              All critical incidents resolved. System nominal.
+              All P0/P1 items resolved. System nominal.
             </div>
           )}
           {feed.map((inc) => (

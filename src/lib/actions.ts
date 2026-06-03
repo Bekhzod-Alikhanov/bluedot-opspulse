@@ -17,7 +17,7 @@ async function actor() {
 }
 
 function revalidateAll() {
-  ["/", "/queue", "/triage", "/backup", "/finance", "/alerts", "/cockpit", "/templates"].forEach(
+  ["/", "/queue", "/triage", "/backup", "/finance", "/alerts", "/cockpit", "/templates", "/systemic"].forEach(
     (p) => revalidatePath(p)
   );
 }
@@ -125,7 +125,7 @@ export async function stabilizeCohort11() {
       risk: "Green",
       stabilized: true,
       headline:
-        "STABILIZED: Jamie suspended pending review, UK backup deploying for Friday, written response drafted for Sarah Chen.",
+        "STABILIZED: Jamie paused pending facilitator review, UK backup deploying for Friday, written response drafted for Sarah Chen.",
     })
     .eq("id", 11);
   await admin
@@ -133,7 +133,7 @@ export async function stabilizeCohort11() {
     .update({ status: "Resolved", resolved_at: new Date().toISOString(), resolved_by: a.name })
     .in("id", ["INC-2041", "INC-2045", "INC-2039"]);
   const slack = await sendSlack(
-    ":rotating_light: *Cohort 11 stabilized* — Jamie Whitford suspended pending facilitator review. Backup being deployed for Friday 4-6pm. Sarah Chen response drafted.",
+    ":rotating_light: *Cohort 11 stabilized* - Jamie Whitford paused pending facilitator review. Backup being deployed for Friday 4-6pm. Sarah Chen response drafted.",
     "OpsPulse · triggered by " + a.name
   );
   await logAction({ actor: a.name, actorRole: a.role, action: "stabilize_cohort", targetType: "cohort", targetId: "C11", payload: { slack } });
@@ -214,9 +214,9 @@ export async function haltAutoPay() {
     .eq("id", "INC-2047");
   const email = await sendEmail({
     to: process.env.DIGEST_TO,
-    subject: "Notion invoice #20451 — auto-pay halted, escalation",
+    subject: "Notion invoice #20451 - auto-pay halted, verification needed",
     text:
-      "Halted auto-pay on Notion invoice #20451 ($48,000 vs $4,800 last year). Root cause: domain-capture auto-provisioned ~215 external seats. Requesting sign-off to claw back and request a corrected invoice. — OpsPulse",
+      "Halted auto-pay on NotionTools invoice #20451 ($48,000 vs $4,800 last year). Next step: verify sender/vendor through known channels, then validate the working hypothesis that domain capture created ~215 external seats. Requesting sign-off to pursue a corrected invoice if verified. - OpsPulse",
   });
   await logAction({ actor: a.name, actorRole: a.role, action: "halt_autopay", targetType: "invoice", targetId: "#20451", payload: { email } });
   revalidateAll();

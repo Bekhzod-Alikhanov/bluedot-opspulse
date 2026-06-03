@@ -55,7 +55,7 @@ export default function Sidebar({
           <div className={`h-full rounded-full ${tone.bar} transition-all duration-700`} style={{ width: `${systemHealth}%` }} />
         </div>
         <p className="mt-2.5 font-mono text-[11px] text-slate-500">
-          {criticalAlerts} critical {criticalAlerts === 1 ? "alert" : "alerts"} open
+          {criticalAlerts} P0/P1 {criticalAlerts === 1 ? "item" : "items"} open
         </p>
       </div>
 

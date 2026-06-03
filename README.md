@@ -6,6 +6,8 @@ Built around the **Technical AI Safety** course scenario (Round 4, Week 4 of 5, 
 
 **▶ Live demo:** [bluedot-opspulse.vercel.app](https://bluedot-opspulse.vercel.app) — one click to enter as **Ops Lead** or **Management** (no signup).
 
+> **Work-test framing.** This dashboard is a supplementary artifact built to show how I would operationalise the Monday sweep. The Google Doc / Notion submission remains the source of truth for the required written answer.
+
 ![Control Room](docs/screenshots/control-room.png)
 
 ---
@@ -23,14 +25,15 @@ Two shifts make it more than a dashboard:
 
 | Module | What it does |
 | --- | --- |
-| **Control Room** | KPIs, quality-variance & onboarding charts, live P0/P1 feed |
+| **Control Room** | Monday Decision Brief, KPIs, quality-variance & onboarding charts, live P0/P1 feed |
 | **Triage Queue** | One ranked inbox: priority × SLA timers, notes, snooze, manual creation |
-| **Cohort Triage** | Risk-ranked grid + one-click action drawers (suspend & deploy cover; remedy onboarding) |
+| **Cohort Triage** | Risk-ranked grid + calibrated action drawers (pause pending review + deploy cover; remedy onboarding) |
 | **Backup Matcher** | Timezone/availability-aware facilitator scheduling (£80 rate) with a generated calendar invite |
-| **Financial Hygiene** | Anomaly audit + halt-and-escalate with a calibrated message |
-| **Monitors & Alerts** | Prevention rules that fire alerts before incidents explode |
+| **Financial Hygiene** | Invoice hold, vendor verification, and a cautious working hypothesis before escalation |
+| **Monitors & Alerts** | Prevention rules with seeded preview findings when no live alerts exist |
+| **Systemic Fix** | Monday Course Health Sweep checklist, RAG rules, and automation-failure runbook |
 | **Leadership Cockpit** | Round-over-round trends, cost, facilitator leaderboard, **predictive risk**, risk register, Monday digest |
-| **Comms Library + Activity Log** | Calibrated response templates and a full who-did-what audit trail |
+| **Drafts Shipped + Activity Log** | Actual work-test comms drafts and a full who-did-what audit trail |
 
 ---
 
@@ -42,7 +45,7 @@ Two shifts make it more than a dashboard:
 **Cohort Triage** — six cohorts ranked by risk, click to open the action drawer.
 ![Cohort Triage](docs/screenshots/triage.png)
 
-**Financial Hygiene** — seat-level root-cause on the 10× invoice, halt-and-escalate.
+**Financial Hygiene** — vendor verification plus a seat-level working hypothesis on the 10× invoice.
 ![Financial Hygiene](docs/screenshots/finance.png)
 
 **Leadership Cockpit** — trends, cost, predictive risk forecast, risk register, digest.
@@ -88,7 +91,7 @@ node scripts/seed-users.mjs       # creates the two demo accounts
 npm run dev                       # http://localhost:3000
 
 # 4. Quality gates
-npm run typecheck && npm run test && npm run build
+npm run lint && npm run typecheck && npm run test && npm run build
 ```
 
 Optional env (`.env.local`): `RESEND_API_KEY` + `DIGEST_TO` to send real email, `SLACK_WEBHOOK_URL` to post real Slack alerts. Omit them and those actions simulate cleanly.
@@ -101,7 +104,7 @@ Optional env (`.env.local`): `RESEND_API_KEY` + `DIGEST_TO` to send real email, 
 src/
 ├── app/
 │   ├── (app)/            # authed shell: control room, queue, triage, backup,
-│   │                     #   finance, alerts, cockpit, activity, templates
+│   │                     #   finance, alerts, systemic fix, cockpit, activity, drafts
 │   ├── login/            # auth + one-click demo logins
 │   └── api/cron/         # scheduled monitors + weekly digest (Vercel Cron)
 ├── components/           # view components, nav, hooks, welcome tour
@@ -112,6 +115,7 @@ src/
 │   ├── sla.ts            # health, SLA, ranking (unit-tested)
 │   ├── monitors.ts       # prevention rules engine (unit-tested)
 │   ├── risk.ts           # predictive risk scoring (unit-tested)
+│   ├── workTestBrief.ts  # static decision brief, shipped drafts, health sweep
 │   └── integrations/     # slack / email / calendar (graceful degradation)
 ├── middleware.ts         # auth gating + session refresh
 └── supabase/             # schema.sql + migrations + seed scripts
@@ -140,4 +144,4 @@ src/
 
 > **Note on data.** Self-contained demo. All names and figures are seeded mock data dramatised from a course-operations scenario; no live systems are connected. The *interactions* are real (state persists, metrics recompute, audit is recorded) — the outbound integrations are simulated unless keys are supplied.
 
-*Built as a portfolio artifact for a Course Operations Lead work test.*
+*Built as a supplementary dashboard artifact for a Course Operations Lead work test.*
